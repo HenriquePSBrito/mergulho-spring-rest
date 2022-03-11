@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.algaworks.logapi.domain.model.Cliente;
 import com.algaworks.logapi.domain.repository.ClienteRepository;
+import com.algaworks.logapi.domain.services.CatalogoClienteService;
 
 @RestController
 @RequestMapping("/clientes") //tira a obrigatoriedade da chamada do GetMapping("/clientes")
@@ -28,7 +29,13 @@ public class ClienteController {
 	
 	@Autowired
 	private ClienteRepository clienteRepository;
+	private CatalogoClienteService catalogoClienteService;
 	
+	public ClienteController(CatalogoClienteService catalogoClienteService) {
+		super();
+		this.catalogoClienteService = catalogoClienteService;
+	}
+
 	@GetMapping
 	public List<Cliente> Listar(){
 		return clienteRepository.findAll();
@@ -52,18 +59,19 @@ public class ClienteController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public Cliente adicionar(@Valid @RequestBody Cliente cliente) {
-		return clienteRepository.save(cliente);
+		//return clienteRepository.save(cliente); /***excluido e substituido pelo comando abaixo***/
+		return catalogoClienteService.salvar(cliente);
 	}
 	
 	@PutMapping("/{clienteId}")
-	public ResponseEntity<Cliente> atualizar(@PathVariable Long clienteId, @RequestBody Cliente cliente){
+	public ResponseEntity<Cliente> atualizar(@PathVariable Long clienteId, @Valid @RequestBody Cliente cliente){
 		if(!clienteRepository.existsById(clienteId)) {
 			return ResponseEntity.notFound().build();
 		}
 		
 		cliente.setId(clienteId);
-		cliente = clienteRepository.save(cliente);
-		
+		//cliente = clienteRepository.save(cliente); ***excluido e substituido pelo comando abaixo***
+		cliente = catalogoClienteService.salvar(cliente);
 		return ResponseEntity.ok(cliente);
 	}
 	
@@ -75,7 +83,8 @@ public class ClienteController {
 			return ResponseEntity.notFound().build(); 
 		}
 		
-		clienteRepository.deleteById(clienteId);
+		//clienteRepository.deleteById(clienteId); ***excluido e substituido pelo comando abaixo***
+		catalogoClienteService.excluir(clienteId);
 		
 		return ResponseEntity.noContent().build(); //como nao tem corpo de resposta, vai retornar 204 "sem conteudo"
 	}
