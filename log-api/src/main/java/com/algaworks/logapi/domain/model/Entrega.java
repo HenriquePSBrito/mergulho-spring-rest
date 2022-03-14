@@ -2,6 +2,7 @@ package com.algaworks.logapi.domain.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Objects;
 
 import javax.persistence.Embedded;
@@ -12,25 +13,39 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.groups.ConvertGroup;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
+import com.fasterxml.jackson.databind.ser.std.StdKeySerializers.Default;
 
 
 
 @Entity
 public class Entrega {
 	
+	public Entrega() {
+	}
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	@Valid
+	@ConvertGroup(from = Default.class, to = ValidationGroups.ClienteId.class)
+	@NotNull
 	@ManyToOne
 	//@JoinColumn(name = "cliente_id")
 	private Cliente cliente;
 	
 	@Embedded
+	@NotNull
+	@Valid
 	private Destinatario destinatario;
+	
+	@NotNull
 	private BigDecimal taxa;
 	
 	@Enumerated(EnumType.ORDINAL)
@@ -39,13 +54,13 @@ public class Entrega {
 	private StatusEntrega status;
 	
 	@JsonProperty(access = Access.READ_ONLY)
-	private LocalDateTime dataPedido;
+	private OffsetDateTime dataPedido;
 	
 	@JsonProperty(access = Access.READ_ONLY)
-	private LocalDateTime dataFinalizacao;
+	private OffsetDateTime dataFinalizacao;
 	
 	public Entrega(Long id, Cliente cliente, Destinatario destinatario, BigDecimal taxa, StatusEntrega status,
-			LocalDateTime dataPedido, LocalDateTime dataFinalizacao) {
+			OffsetDateTime dataPedido, OffsetDateTime dataFinalizacao) {
 		super();
 		this.id = id;
 		this.cliente = cliente;
@@ -96,19 +111,19 @@ public class Entrega {
 		this.status = status;
 	}
 
-	public LocalDateTime getDataPedido() {
+	public OffsetDateTime getDataPedido() {
 		return dataPedido;
 	}
 
-	public void setDataPedido(LocalDateTime dataPedido) {
+	public void setDataPedido(OffsetDateTime dataPedido) {
 		this.dataPedido = dataPedido;
 	}
 
-	public LocalDateTime getDataFinalizacao() {
+	public OffsetDateTime getDataFinalizacao() {
 		return dataFinalizacao;
 	}
 
-	public void setDataFinalizacao(LocalDateTime dataFinalizacao) {
+	public void setDataFinalizacao(OffsetDateTime dataFinalizacao) {
 		this.dataFinalizacao = dataFinalizacao;
 	}
 
@@ -130,6 +145,4 @@ public class Entrega {
 	}
 	
 	
-	
-
 }
